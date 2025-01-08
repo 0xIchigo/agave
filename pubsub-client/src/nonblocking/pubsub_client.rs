@@ -166,6 +166,7 @@
 //! # Ok::<(), anyhow::Error>(())
 //! ```
 
+use crate::nonblocking::pubsub_client::{DEFAULT_MAX_FAILED_PINGS, DEFAULT_PING_DURATION_SECONDS};
 use {
     futures_util::{
         future::{ready, BoxFuture, FutureExt},
@@ -197,7 +198,7 @@ use {
         net::TcpStream,
         sync::{mpsc, oneshot},
         task::JoinHandle,
-        time::{interval, Interval, Duration},
+        time::{interval, Duration, Interval},
     },
     tokio_stream::wrappers::UnboundedReceiverStream,
     tokio_tungstenite::{
@@ -210,7 +211,6 @@ use {
     },
     url::Url,
 };
-use crate::nonblocking::pubsub_client::{DEFAULT_PING_DURATION_SECONDS, DEFAULT_MAX_FAILED_PINGS};
 
 pub type PubsubClientResult<T = ()> = Result<T, PubsubClientError>;
 
@@ -511,7 +511,8 @@ impl PubsubClient {
         let mut subscriptions = BTreeMap::new();
         let (unsubscribe_sender, mut unsubscribe_receiver) = mpsc::unbounded_channel();
 
-        let mut ping_interval: Interval = interval(Duration::from_secs(DEFAULT_PING_DURATION_SECONDS));
+        let mut ping_interval: Interval =
+            interval(Duration::from_secs(DEFAULT_PING_DURATION_SECONDS));
         let mut elapsed_pings: usize = 0usize;
 
         loop {

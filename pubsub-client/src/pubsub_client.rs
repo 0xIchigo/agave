@@ -221,7 +221,7 @@ where
                 if message.is_ping() || message.is_pong() {
                     return Ok(None);
                 }
-    
+
                 let message_text = &message.into_text()?;
                 if let Ok(json_msg) = serde_json::from_str::<Map<String, Value>>(message_text) {
                     if let Some(Object(params)) = json_msg.get("params") {
@@ -232,7 +232,7 @@ where
                         }
                     }
                 }
-    
+
                 Err(PubsubClientError::UnexpectedMessageError(format!(
                     "msg={message_text}"
                 )))
@@ -836,7 +836,7 @@ impl PubsubClient {
                     break;
                 }
             }
-            
+
             // Read timeout to prevent indefinite blocking on `read_message`
             socket
                 .write()
